@@ -46,17 +46,17 @@ import net.shibboleth.utilities.java.support.xml.SerializeSupport;
 
 /**
  * Class which implements SAML2-specific options for {@link EncryptedElementType} objects.
- * 
+ *
  * <p>
  * For information on other parameters and options, and general XML Encryption issues,
  * see {@link org.opensaml.xmlsec.encryption.support.Decrypter}.
  * </p>
  */
 public class Decrypter extends org.opensaml.xmlsec.encryption.support.Decrypter {
-    
+
     /** Class logger. */
     private final Logger log = LoggerFactory.getLogger(Decrypter.class);
-    
+
     /**
      * Constructor.
      *
@@ -65,21 +65,21 @@ public class Decrypter extends org.opensaml.xmlsec.encryption.support.Decrypter 
     public Decrypter(final DecryptionParameters params) {
         super(params);
     }
-    
+
     /**
      * Constructor.
-     * 
+     *
      * @param newResolver resolver for data encryption keys.
      * @param newKEKResolver resolver for key encryption keys.
      * @param newEncKeyResolver resolver for EncryptedKey elements
      */
     public Decrypter(@Nullable final KeyInfoCredentialResolver newResolver,
-            @Nullable final KeyInfoCredentialResolver newKEKResolver,
-            @Nullable final EncryptedKeyResolver newEncKeyResolver) {
-        
+                     @Nullable final KeyInfoCredentialResolver newKEKResolver,
+                     @Nullable final EncryptedKeyResolver newEncKeyResolver) {
+
         super(newResolver, newKEKResolver, newEncKeyResolver, null, null);
     }
-    
+
     /**
      * Constructor.
      *
@@ -90,17 +90,17 @@ public class Decrypter extends org.opensaml.xmlsec.encryption.support.Decrypter 
      * @param excludeAlgos collection of excluded algorithm URIs
      */
     public Decrypter(@Nullable final KeyInfoCredentialResolver newResolver,
-            @Nullable final KeyInfoCredentialResolver newKEKResolver, 
-            @Nullable final EncryptedKeyResolver newEncKeyResolver,
-            @Nullable final Collection<String> includeAlgos,
-            @Nullable final Collection<String> excludeAlgos) {
-        
+                     @Nullable final KeyInfoCredentialResolver newKEKResolver,
+                     @Nullable final EncryptedKeyResolver newEncKeyResolver,
+                     @Nullable final Collection<String> includeAlgos,
+                     @Nullable final Collection<String> excludeAlgos) {
+
         super(newResolver, newKEKResolver, newEncKeyResolver, includeAlgos, excludeAlgos);
     }
-    
+
     /**
      * Decrypt the specified EncryptedAssertion.
-     * 
+     *
      * @param encryptedAssertion the EncryptedAssertion to decrypt
      * @return an Assertion 
      * @throws DecryptionException thrown when decryption generates an error
@@ -113,9 +113,17 @@ public class Decrypter extends org.opensaml.xmlsec.encryption.support.Decrypter 
         return (Assertion) samlObject;
     }
 
+    public EncryptedAssertion decryptLayer(@Nonnull final EncryptedAssertion encryptedAssertion) throws DecryptionException {
+        final SAMLObject samlObject = decryptData(encryptedAssertion);
+        if (! (samlObject instanceof EncryptedAssertion)) {
+            throw new DecryptionException("Decrypted SAMLObject was not an instance of EncryptedAssertion");
+        }
+        return (EncryptedAssertion) samlObject;
+    }
+
     /**
      * Decrypt the specified EncryptedAttribute.
-     * 
+     *
      * @param encryptedAttribute the EncryptedAttribute to decrypt
      * @return an Attribute
      * @throws DecryptionException thrown when decryption generates an error
@@ -127,16 +135,16 @@ public class Decrypter extends org.opensaml.xmlsec.encryption.support.Decrypter 
         }
         return (Attribute) samlObject;
     }
-    
+
     /**
      * Decrypt the specified EncryptedID.
-     * 
+     *
      * <p>
      * Note that an EncryptedID can contain a NameID, an Assertion
      * or a BaseID.  It is up to the caller to determine the type of
      * the resulting SAMLObject.
      * </p>
-     * 
+     *
      * @param encryptedID the EncryptedID to decrypt
      * @return an XMLObject
      * @throws DecryptionException thrown when decryption generates an error
@@ -148,7 +156,7 @@ public class Decrypter extends org.opensaml.xmlsec.encryption.support.Decrypter 
 
     /**
      * Decrypt the specified NewEncryptedID.
-     * 
+     *
      * @param newEncryptedID the NewEncryptedID to decrypt
      * @return a NewID
      * @throws DecryptionException thrown when decryption generates an error
@@ -160,42 +168,42 @@ public class Decrypter extends org.opensaml.xmlsec.encryption.support.Decrypter 
         }
         return (NewID) samlObject;
     }
-    
+
     /**
-     * Decrypt the specified instance of EncryptedElementType, and return it as an instance 
+     * Decrypt the specified instance of EncryptedElementType, and return it as an instance
      * of the specified QName.
-     * 
-     * 
+     *
+     *
      * @param encElement the EncryptedElementType to decrypt
      * @return the decrypted SAMLObject
      * @throws DecryptionException thrown when decryption generates an error
      */
     private SAMLObject decryptData(@Nonnull final EncryptedElementType encElement) throws DecryptionException {
-        
+
         if (encElement.getEncryptedData() == null) {
             throw new DecryptionException("Element had no EncryptedData child");
         }
-        
+
         XMLObject xmlObject = null;
         try {
             xmlObject = decryptData(encElement.getEncryptedData(), isRootInNewDocument());
         } catch (final DecryptionException e) {
             log.error("SAML Decrypter encountered an error decrypting element content: {}", e.getMessage());
-            throw e; 
+            throw e;
         }
 
         logPostDecryption(xmlObject);
-        
+
         if (! (xmlObject instanceof SAMLObject)) {
             throw new DecryptionException("Decrypted XMLObject was not an instance of SAMLObject");
         }
-        
+
         return (SAMLObject) xmlObject;
     }
 
     /**
      * Log the target object after decryption.
-     * 
+     *
      * @param xmlObject the decrypted XMLObject
      */
     private void logPostDecryption(final XMLObject xmlObject) {

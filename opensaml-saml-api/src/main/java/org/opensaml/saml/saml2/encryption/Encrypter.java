@@ -69,12 +69,12 @@ import com.google.common.base.Strings;
 /**
  * Encrypter for SAML 2 SAMLObjects which has specific options for generating instances of subtypes of
  * {@link EncryptedElementType}.
- * 
+ *
  * <p>
  * Overloaded methods are provided for encrypting various SAML 2 elements to their corresponding encrypted element
  * variant of {@link EncryptedElementType}.
  * </p>
- * 
+ *
  * <p>
  * Support is also provided for differing placement options for any associated EncryptedKeys that may be generated. The
  * options are:
@@ -89,17 +89,17 @@ import com.google.common.base.Strings;
  * <p>
  * The default placement is <code>PEER</code>.
  * </p>
- * 
+ *
  * <p>
  * The EncryptedKey forward and back referencing behavior associated with these key placement options is intended to be
  * consistent with the guidelines detailed in SAML 2 Errata E43. See that document for further information.
  * </p>
- * 
+ *
  * <p>
  * For information on other parameters and options, and general XML Encryption issues, see
  * {@link org.opensaml.xmlsec.encryption.support.Encrypter}.
  * </p>
- * 
+ *
  */
 public class Encrypter extends org.opensaml.xmlsec.encryption.support.Encrypter {
 
@@ -153,7 +153,7 @@ public class Encrypter extends org.opensaml.xmlsec.encryption.support.Encrypter 
 
     /**
      * Constructor.
-     * 
+     *
      * @param dataEncParams the data encryption parameters
      * @param keyEncParams the key encryption parameters
      */
@@ -168,7 +168,7 @@ public class Encrypter extends org.opensaml.xmlsec.encryption.support.Encrypter 
 
     /**
      * Constructor.
-     * 
+     *
      * @param dataEncParams the data encryption parameters
      * @param keyEncParam the key encryption parameter
      */
@@ -186,7 +186,7 @@ public class Encrypter extends org.opensaml.xmlsec.encryption.support.Encrypter 
 
     /**
      * Constructor.
-     * 
+     *
      * @param dataEncParams the data encryption parameters
      */
     public Encrypter(final DataEncryptionParameters dataEncParams) {
@@ -229,7 +229,7 @@ public class Encrypter extends org.opensaml.xmlsec.encryption.support.Encrypter 
 
     /**
      * Set the generator to use when creating XML ID attribute values.
-     * 
+     *
      * @param newIDGenerator the new IdentifierGenerator to use
      */
     public void setIDGenerator(final IdentifierGenerationStrategy newIDGenerator) {
@@ -238,7 +238,7 @@ public class Encrypter extends org.opensaml.xmlsec.encryption.support.Encrypter 
 
     /**
      * Get the current key placement option.
-     * 
+     *
      * @return returns the key placement option.
      */
     public KeyPlacement getKeyPlacement() {
@@ -247,7 +247,7 @@ public class Encrypter extends org.opensaml.xmlsec.encryption.support.Encrypter 
 
     /**
      * Set the key placement option.
-     * 
+     *
      * @param newKeyPlacement The new key placement option to set
      */
     public void setKeyPlacement(final KeyPlacement newKeyPlacement) {
@@ -256,7 +256,7 @@ public class Encrypter extends org.opensaml.xmlsec.encryption.support.Encrypter 
 
     /**
      * Encrypt the specified Assertion.
-     * 
+     *
      * @param assertion the Assertion to encrypt
      * @return an EncryptedAssertion
      * @throws EncryptionException thrown when encryption generates an error
@@ -266,9 +266,14 @@ public class Encrypter extends org.opensaml.xmlsec.encryption.support.Encrypter 
         return (EncryptedAssertion) encrypt(assertion, EncryptedAssertion.DEFAULT_ELEMENT_NAME);
     }
 
+    public EncryptedAssertion encrypt(final EncryptedAssertion encryptedAssertion) throws EncryptionException {
+        logPreEncryption(encryptedAssertion, "EncryptedAssertion");
+        return (EncryptedAssertion) encrypt(encryptedAssertion, EncryptedAssertion.DEFAULT_ELEMENT_NAME);
+    }
+
     /**
      * Encrypt the specified Assertion, treating as an identifier and returning an EncryptedID.
-     * 
+     *
      * @param assertion the Assertion to encrypt
      * @return an EncryptedID
      * @throws EncryptionException thrown when encryption generates an error
@@ -280,7 +285,7 @@ public class Encrypter extends org.opensaml.xmlsec.encryption.support.Encrypter 
 
     /**
      * Encrypt the specified Attribute.
-     * 
+     *
      * @param attribute the Attribute to encrypt
      * @return an EncryptedAttribute
      * @throws EncryptionException thrown when encryption generates an error
@@ -292,7 +297,7 @@ public class Encrypter extends org.opensaml.xmlsec.encryption.support.Encrypter 
 
     /**
      * Encrypt the specified NameID.
-     * 
+     *
      * @param nameID the NameID to encrypt
      * @return an EncryptedID
      * @throws EncryptionException thrown when encryption generates an error
@@ -304,7 +309,7 @@ public class Encrypter extends org.opensaml.xmlsec.encryption.support.Encrypter 
 
     /**
      * Encrypt the specified BaseID.
-     * 
+     *
      * @param baseID the BaseID to encrypt
      * @return an EncryptedID
      * @throws EncryptionException thrown when encryption generates an error
@@ -316,7 +321,7 @@ public class Encrypter extends org.opensaml.xmlsec.encryption.support.Encrypter 
 
     /**
      * Encrypt the specified NewID.
-     * 
+     *
      * @param newID the NewID to encrypt
      * @return a NewEncryptedID
      * @throws EncryptionException thrown when encryption generates an error
@@ -325,10 +330,10 @@ public class Encrypter extends org.opensaml.xmlsec.encryption.support.Encrypter 
         logPreEncryption(newID, "NewID");
         return (NewEncryptedID) encrypt(newID, NewEncryptedID.DEFAULT_ELEMENT_NAME);
     }
-    
+
     /**
      * Log the target object prior to encryption.
-     * 
+     *
      * @param xmlObject the XMLObject to encrypt
      * @param objectType String description of the type of object to encrypt
      */
@@ -346,7 +351,7 @@ public class Encrypter extends org.opensaml.xmlsec.encryption.support.Encrypter 
     /**
      * Encrypt the specified XMLObject, and return it as an instance of the specified QName, which should be one of the
      * types derived from {@link org.opensaml.saml.saml2.core.EncryptedElementType}.
-     * 
+     *
      * @param xmlObject the XMLObject to encrypt
      * @param encElementName the QName of the specialization of EncryptedElementType to return
      * @return a specialization of {@link org.opensaml.saml.saml2.core.EncryptedElementType}
@@ -394,16 +399,16 @@ public class Encrypter extends org.opensaml.xmlsec.encryption.support.Encrypter 
     /**
      * Handle post-processing of generated EncryptedData and EncryptedKey(s) and storage in the appropriate
      * EncryptedElementType instance.
-     * 
+     *
      * @param encElement the EncryptedElementType instance which will hold the encrypted data and keys
      * @param encData the EncryptedData object
      * @param encKeys the list of EncryptedKey objects
      * @return the processed EncryptedElementType instance
-     * 
+     *
      * @throws EncryptionException thrown when processing encounters an error
      */
     protected EncryptedElementType processElements(final EncryptedElementType encElement, final EncryptedData encData,
-            final List<EncryptedKey> encKeys) throws EncryptionException {
+                                                   final List<EncryptedKey> encKeys) throws EncryptionException {
         // First ensure certain elements/attributes are non-null, common to all cases.
         if (encData.getID() == null) {
             encData.setID(idGenerator.generateIdentifier());
@@ -438,16 +443,16 @@ public class Encrypter extends org.opensaml.xmlsec.encryption.support.Encrypter 
 
     /**
      * Place the EncryptedKey elements inside the KeyInfo element within the EncryptedData element.
-     * 
+     *
      * Although operationally trivial, this method is provided so that subclasses may override or augment as desired.
-     * 
+     *
      * @param encElement the EncryptedElementType instance which will hold the encrypted data and keys
      * @param encData the EncryptedData object
      * @param encKeys the list of EncryptedKey objects
      * @return the processed EncryptedElementType instance
      */
     protected EncryptedElementType placeKeysInline(final EncryptedElementType encElement, final EncryptedData encData,
-            final List<EncryptedKey> encKeys) {
+                                                   final List<EncryptedKey> encKeys) {
 
         log.debug("Placing EncryptedKey elements inline inside EncryptedData");
 
@@ -460,14 +465,14 @@ public class Encrypter extends org.opensaml.xmlsec.encryption.support.Encrypter 
      * Store the specified EncryptedData and EncryptedKey(s) in the specified instance of EncryptedElementType as peer
      * elements, following SAML 2 Errata E43 guidelines for forward and back referencing between the EncryptedData and
      * EncryptedKey(s).
-     * 
+     *
      * @param encElement a specialization of EncryptedElementType to store the encrypted data and keys
      * @param encData the EncryptedData to store
      * @param encKeys the EncryptedKey(s) to store
      * @return the resulting specialization of EncryptedElementType
      */
     protected EncryptedElementType placeKeysAsPeers(final EncryptedElementType encElement, final EncryptedData encData,
-            final List<EncryptedKey> encKeys) {
+                                                    final List<EncryptedKey> encKeys) {
 
         log.debug("Placing EncryptedKey elements as peers of EncryptedData in EncryptedElementType");
 
@@ -494,7 +499,7 @@ public class Encrypter extends org.opensaml.xmlsec.encryption.support.Encrypter 
 
     /**
      * Link a single EncryptedKey to the EncryptedData according to guidelines in SAML Errata E43.
-     * 
+     *
      * @param encData the EncryptedData
      * @param encKey the EncryptedKey
      */
@@ -514,7 +519,7 @@ public class Encrypter extends org.opensaml.xmlsec.encryption.support.Encrypter 
 
     /**
      * Link multiple "multicast" EncryptedKeys to the EncryptedData according to guidelines in SAML Errata E43.
-     * 
+     *
      * @param encData the EncryptedData
      * @param encKeys the list of EncryptedKeys
      */

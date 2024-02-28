@@ -24,6 +24,10 @@ org.opensaml.xmlsec.algorithm.descriptors.KeyAgreementDHLegacyKDF
 org.opensaml.xmlsec.algorithm.descriptors.KeyAgreementECDH
 org.opensaml.xmlsec.algorithm.descriptors.KeyTransportRSA15
 org.opensaml.xmlsec.algorithm.descriptors.KeyTransportRSAOAEP
+org.opensaml.xmlsec.algorithm.descriptors.KeyTransportCMCE
+org.opensaml.xmlsec.algorithm.descriptors.KeyTransportKyber
+org.opensaml.xmlsec.algorithm.descriptors.KeyTransportBIKE
+org.opensaml.xmlsec.algorithm.descriptors.KeyTransportHQC
 org.opensaml.xmlsec.algorithm.descriptors.KeyTransportRSAOAEPMGF1P
 org.opensaml.xmlsec.algorithm.descriptors.SignatureDSASHA1
 org.opensaml.xmlsec.algorithm.descriptors.SignatureDSASHA256
@@ -39,6 +43,14 @@ org.opensaml.xmlsec.algorithm.descriptors.SignatureRSASHA224
 org.opensaml.xmlsec.algorithm.descriptors.SignatureRSASHA256
 org.opensaml.xmlsec.algorithm.descriptors.SignatureRSASHA384
 org.opensaml.xmlsec.algorithm.descriptors.SignatureRSASHA512
+org.opensaml.xmlsec.algorithm.descriptors.SignatureDilithium
+org.opensaml.xmlsec.algorithm.descriptors.SignatureFalcon
+org.opensaml.xmlsec.algorithm.descriptors.SignatureSPHINCSPlus
+org.opensaml.xmlsec.algorithm.descriptors.SignatureMLDSA44andECDSAP256
+org.opensaml.xmlsec.algorithm.descriptors.SignatureMLDSA87andECDSAP384
+org.opensaml.xmlsec.algorithm.descriptors.SignatureMLDSA87andECDSAP521
+org.opensaml.xmlsec.algorithm.descriptors.SignatureFalcon512andECDSAP256
+org.opensaml.xmlsec.algorithm.descriptors.SignatureFalcon1024andECDSAP521
 org.opensaml.xmlsec.algorithm.descriptors.SymmetricKeyWrapAES128
 org.opensaml.xmlsec.algorithm.descriptors.SymmetricKeyWrapAES192
 org.opensaml.xmlsec.algorithm.descriptors.SymmetricKeyWrapAES256

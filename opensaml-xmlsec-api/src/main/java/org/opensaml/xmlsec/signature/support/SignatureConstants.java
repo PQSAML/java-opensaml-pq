@@ -30,15 +30,18 @@ public final class SignatureConstants {
 
     /** XML Signature 1.1 namespace and algorithm prefix. */
     public static final String XMLSIG11_NS = "http://www.w3.org/2009/xmldsig11#";
-    
+
     /** XML Signature QName prefix. */
     public static final String XMLSIG_PREFIX = "ds";
-    
+
     /** XML Signature 1.1 QName prefix. */
     public static final String XMLSIG11_PREFIX = "ds11";
 
     /** Algorithm URI prefix used by RFC 4051. */
     public static final String MORE_ALGO_NS = "http://www.w3.org/2001/04/xmldsig-more#";
+
+    public static final String PQC_ALGO_NS = "http://www.w3.org/2023/02/xmldsig-pqc#";
+    public static final String PQC_COMPOSITES_ALGO_NS = "http://www.w3.org/2023/02/xmldsig-pqc-composites#";
 
     // *********************************************************
     // Algorithm URI's
@@ -49,7 +52,7 @@ public final class SignatureConstants {
 
     /** Signature - Optional DSAwithSHA1 (DSS). */
     public static final String ALGO_ID_SIGNATURE_DSA_SHA1 = ALGO_ID_SIGNATURE_DSA;
-    
+
     /** Signature - Required RSAwithSHA1 (PKCS1). */
     public static final String ALGO_ID_SIGNATURE_RSA = XMLSIG_NS + "rsa-sha1";
 
@@ -127,14 +130,14 @@ public final class SignatureConstants {
     public static final String TYPE_KEYINFO_RAW_PKCS7_SIGNED_DATA = MORE_ALGO_NS + "rawPKCS7signedData";
 
     // These are additional type URIs defined by XML Signature 1.1
-    
+
     /** Type - KeyInfo ECKeyValue. */
     public static final String TYPE_KEYINFO_ECKEYVALUE = XMLSIG11_NS + "ECKeyValue";
-    
+
     /** Type - KeyInfo DEREncodedKeyValue. */
     public static final String TYPE_KEYINFO_DERENCODEDKEYVALUE = XMLSIG11_NS + "DEREncodedKeyValue";
-    
-    
+
+
     // *********************************************************
     // Canonicalization
     // *********************************************************
@@ -150,7 +153,7 @@ public final class SignatureConstants {
 
     /** Canonicalization - Inclusive 1.1 WITH comments. */
     public static final String ALGO_ID_C14N11_WITH_COMMENTS = ALGO_ID_C14N11_OMIT_COMMENTS + "#WithComments";
-    
+
     /** Canonicalization - Exclusive WITHOUT comments. */
     public static final String ALGO_ID_C14N_EXCL_OMIT_COMMENTS = "http://www.w3.org/2001/10/xml-exc-c14n#";
 
@@ -175,7 +178,7 @@ public final class SignatureConstants {
 
     /** Transform - Recommended Inclusive c14n 1.1 WITH comments. */
     public static final String TRANSFORM_C14N11_WITH_COMMENTS = ALGO_ID_C14N11_WITH_COMMENTS;
-    
+
     /** Transform - Required Exclusive c14n WITHOUT comments. */
     public static final String TRANSFORM_C14N_EXCL_OMIT_COMMENTS = ALGO_ID_C14N_EXCL_OMIT_COMMENTS;
 
@@ -196,6 +199,9 @@ public final class SignatureConstants {
      * String TRANSFORM_XPATH2FILTER04 = "http://www.w3.org/2002/04/xmldsig-filter2"; public static final String
      * TRANSFORM_XPATH2FILTER = "http://www.w3.org/2002/06/xmldsig-filter2";
      */
+
+    /** XPath 2 filter which removes a signature from the root element. This is used in hybrid signature scenario. */
+    public static final String EXTRA_SIGNATURE_XPATH2_FILTER = "/saml2p:*/ds:Signature[1]";
 
     // *********************************************************
     // Some additional algorithm URIs from RFC 4051
@@ -226,7 +232,7 @@ public final class SignatureConstants {
 
     /** HMAC - Optional HMAC-SHA224. */
     public static final String ALGO_ID_MAC_HMAC_SHA224 = MORE_ALGO_NS + "hmac-sha224";
-    
+
     /** HMAC - Optional HMAC-SHA256. */
     public static final String ALGO_ID_MAC_HMAC_SHA256 = MORE_ALGO_NS + "hmac-sha256";
 
@@ -250,7 +256,7 @@ public final class SignatureConstants {
 
     /** Signature - Optional ECDSAwithSHA512. */
     public static final String ALGO_ID_SIGNATURE_ECDSA_SHA512 = MORE_ALGO_NS + "ecdsa-sha512";
-    
+
     /** Digest - Optional MD5. */
     public static final String ALGO_ID_DIGEST_NOT_RECOMMENDED_MD5 = MORE_ALGO_NS + "md5";
 
@@ -259,27 +265,37 @@ public final class SignatureConstants {
 
     /** Digest - Optional SHA384. */
     public static final String ALGO_ID_DIGEST_SHA384 = MORE_ALGO_NS + "sha384";
-    
+
     // *********************************************************
     // Some additional algorithm URIs from XML Signature 1.1
     // *********************************************************
     /** Signature - Optional DSAwithSHA256 (DSS). */
     public static final String ALGO_ID_SIGNATURE_DSA_SHA256 = XMLSIG11_NS + "dsa-sha256";
-    
+
     // *********************************************************
-    // Alias in some additional algorithm URI's used in XML 
+    // Alias in some additional algorithm URI's used in XML
     // Signature, but defined in XML Encryption.
     // *********************************************************
     /** Message Digest - SHA256 (Note: Defined by XML Encryption). */
     public static final String ALGO_ID_DIGEST_SHA256 = EncryptionConstants.ALGO_ID_DIGEST_SHA256;
-    
+
     /** Message Digest - SHA512 (Note: Defined by XML Encryption). */
     public static final String ALGO_ID_DIGEST_SHA512 = EncryptionConstants.ALGO_ID_DIGEST_SHA512;
-    
+
     /** Message Digest - RIPEMD-160 (Note: Defined by XML Encryption). */
     public static final String ALGO_ID_DIGEST_RIPEMD160 = EncryptionConstants.ALGO_ID_DIGEST_RIPEMD160;
-    
-    
+
+    public static final String ALGO_ID_SIGNATURE_DILITHIUM = PQC_ALGO_NS + "dilithium";
+    public static final String ALGO_ID_SIGNATURE_FALCON = PQC_ALGO_NS + "falcon";
+    public static final String ALGO_ID_SIGNATURE_SPHINCSPLUS = PQC_ALGO_NS + "sphincsplus";
+    public static final String ALGO_ID_SIGNATURE_MLDSA44andECDSAP256 = PQC_COMPOSITES_ALGO_NS + "mldsa44andecdsap256";
+    public static final String ALGO_ID_SIGNATURE_MLDSA87andECDSAP384 = PQC_COMPOSITES_ALGO_NS + "mldsa87andecdsap384";
+    public static final String ALGO_ID_SIGNATURE_MLDSA87andECDSAP521 = PQC_COMPOSITES_ALGO_NS + "mldsa87andecdsap521";
+    public static final String ALGO_ID_SIGNATURE_Falcon512andECDSAP256 = PQC_COMPOSITES_ALGO_NS + "falcon512andecdsap256";
+    public static final String ALGO_ID_SIGNATURE_Falcon1024andECDSAP521 = PQC_COMPOSITES_ALGO_NS + "falcon1024andecdsap521";
+
+
+
     /** Constructor. */
     private SignatureConstants() {
 

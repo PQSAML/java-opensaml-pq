@@ -25,6 +25,9 @@ public final class EncryptionConstants {
     /** XML Encryption namespace. */
     public static final String XMLENC_NS = "http://www.w3.org/2001/04/xmlenc#";
 
+    public static final String PQC_ALGO_NS = "http://www.w3.org/2023/02/xmlenc-pqc#";
+
+
     /** XML Encryption QName prefix. */
     public static final String XMLENC_PREFIX = "xenc";
 
@@ -75,7 +78,7 @@ public final class EncryptionConstants {
     // *************************************************
     /** Key Agreement - OPTIONAL Diffie-Hellman with Legacy Key Derivation Function. */
     public static final String ALGO_ID_KEYAGREEMENT_DH = XMLENC_NS + "dh";
-    
+
     /** URI for DHKeyValue. */
     public static final String TYPE_DH_KEY_VALUE = XMLENC_NS + "DHKeyValue";
 
@@ -114,19 +117,25 @@ public final class EncryptionConstants {
 
     /** XML Encryption 1.1 QName prefix. */
     public static final String XMLENC11_PREFIX = "xenc11";
-    
+
     /** Key Transport - OPTIONAL RSA-OAEP.  */
     public static final String ALGO_ID_KEYTRANSPORT_RSAOAEP11 = XMLENC11_NS + "rsa-oaep";
 
+    /** Post-quantum KEM */
+    public  static final String ALGO_ID_KEM_CMCE = PQC_ALGO_NS + "cmce";
+    public  static final String ALGO_ID_KEM_KYBER = PQC_ALGO_NS + "kyber";
+    public  static final String ALGO_ID_KEM_BIKE = PQC_ALGO_NS + "bike";
+    public  static final String ALGO_ID_KEM_HQC = PQC_ALGO_NS + "hqc";
+
     /** Block Encryption - REQUIRED AES128-GCM. */
     public static final String ALGO_ID_BLOCKCIPHER_AES128_GCM = XMLENC11_NS + "aes128-gcm";
-        
+
     /** Block Encryption - OPTIONAL AES192-GCM. */
     public static final String ALGO_ID_BLOCKCIPHER_AES192_GCM = XMLENC11_NS + "aes192-gcm";
 
     /** Block Encryption - OPTIONAL AES256-GCM. */
     public static final String ALGO_ID_BLOCKCIPHER_AES256_GCM = XMLENC11_NS + "aes256-gcm";
-    
+
     /** Mask Generation Function - MGF1 with SHA-1. */
     public static final String ALGO_ID_MGF1_SHA1 = XMLENC11_NS + "mgf1sha1";
 
@@ -144,22 +153,24 @@ public final class EncryptionConstants {
 
     /** URI for DerivedKey. */
     public static final String TYPE_DERIVED_KEY = XMLENC11_NS + "DerivedKey";
-        
+
     /** URI for ECKeyValue. */
     public static final String TYPE_EC_KEY_VALUE = XMLENC11_NS + "ECKeyValue";
-        
+
     /** Key Agreement - Diffie-Hellman with Explicit Key Derivation Function. */
     public static final String ALGO_ID_KEYAGREEMENT_DH_EXPLICIT_KDF = XMLENC11_NS + "dh-es";
-        
+
     /** Key Agreement - Elliptic Curve Diffie-Hellman (ECDH) Ephemeral-Static Mode. */
     public static final String ALGO_ID_KEYAGREEMENT_ECDH_ES = XMLENC11_NS + "ECDH-ES";
-        
+
     /** Key Derivation Method - ConcatKDF. */
     public static final String ALGO_ID_KEYDERIVATION_CONCATKDF = XMLENC11_NS + "ConcatKDF";
-        
+
     /** Key Derivation Method - PBKDF2. */
     public static final String ALGO_ID_KEYDERIVATION_PBKDF2 = XMLENC11_NS + "pbkdf2";
-        
+
+    public static final String MIME_TYPE_LAYERED_ENCRYPTED_ASSERTION = "enc/multilayer";
+
     /** Constructor. */
     private EncryptionConstants() {
 

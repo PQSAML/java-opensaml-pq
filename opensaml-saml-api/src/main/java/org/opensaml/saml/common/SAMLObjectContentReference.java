@@ -30,14 +30,17 @@ import net.shibboleth.utilities.java.support.collection.LazySet;
 import net.shibboleth.utilities.java.support.logic.Constraint;
 import net.shibboleth.utilities.java.support.primitive.StringSupport;
 
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.signature.XMLSignatureException;
 import org.apache.xml.security.transforms.Transform;
 import org.apache.xml.security.transforms.TransformationException;
 import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.transforms.params.InclusiveNamespaces;
+import org.apache.xml.security.transforms.params.XPath2FilterContainer;
 import org.opensaml.core.xml.NamespaceManager;
 import org.opensaml.core.xml.XMLObject;
+import org.opensaml.saml.common.xml.SAMLConstants;
 import org.opensaml.xmlsec.signature.support.ConfigurableContentReference;
 import org.opensaml.xmlsec.signature.support.SignatureConstants;
 import org.opensaml.xmlsec.signature.support.TransformsConfigurableContentReference;
@@ -47,23 +50,23 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Strings;
 
 /**
- * A content reference for SAML objects that will be signed. The reference is created per the SAML specification. 
- * 
+ * A content reference for SAML objects that will be signed. The reference is created per the SAML specification.
+ *
  * <p>
  * The default digest algorithm used is {@link SignatureConstants#ALGO_ID_DIGEST_SHA256}.
  * </p>
- * 
+ *
  * <p>
  * The default set of transforms applied consists of {@link SignatureConstants#TRANSFORM_ENVELOPED_SIGNATURE}
  * and {@link SignatureConstants#TRANSFORM_C14N_EXCL_WITH_COMMENTS}.
  * </p>
- * 
+ *
  * <p>
- * When generating an exclusive canonicalization transform, an inclusive namespace list is 
+ * When generating an exclusive canonicalization transform, an inclusive namespace list is
  * generated from the namespaces, retrieved from {@link org.opensaml.core.xml.XMLObject#getNamespaces()},
  * used by the SAML object to be signed and all of it's descendants.
  * </p>
- * 
+ *
  * <p>
  * Note that the SAML specification states that:
  *   1) an exclusive canonicalization transform (either with or without comments) SHOULD be used.
@@ -71,7 +74,7 @@ import com.google.common.base.Strings;
  *      SHOULD NOT be used.
  * Careful consideration should be made before deviating from these recommendations.
  * </p>
- * 
+ *
  */
 public class SAMLObjectContentReference implements ConfigurableContentReference,
         TransformsConfigurableContentReference {
@@ -81,7 +84,7 @@ public class SAMLObjectContentReference implements ConfigurableContentReference,
 
     /** SAMLObject this reference refers to. */
     @Nonnull private final SignableSAMLObject signableObject;
-    
+
     /** Algorithm used to digest the content. */
     @Nonnull @NotEmpty private String digestAlgorithm;
 
@@ -90,23 +93,31 @@ public class SAMLObjectContentReference implements ConfigurableContentReference,
 
     /**
      * Constructor.
-     * 
+     *
      * @param newSignableObject the SAMLObject this reference refers to
      */
     public SAMLObjectContentReference(@Nonnull final SignableSAMLObject newSignableObject) {
+        this(newSignableObject, false);
+    }
+
+    public SAMLObjectContentReference(@Nonnull final SignableSAMLObject newSignableObject, boolean extraSignature) {
         signableObject = newSignableObject;
         transforms = new LazyList<>();
-        
+
         // Set defaults
         digestAlgorithm = SignatureConstants.ALGO_ID_DIGEST_SHA256;
-        
+
+        if (extraSignature) {
+            transforms.add(Transforms.TRANSFORM_XPATH2FILTER);
+        }
         transforms.add(SignatureConstants.TRANSFORM_ENVELOPED_SIGNATURE);
+
         transforms.add(SignatureConstants.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
     }
-    
+
     /**
      * Gets the transforms applied to the content prior to digest generation.
-     * 
+     *
      * @return the transforms applied to the content prior to digest generation
      */
     @Nonnull @NonnullElements @Live public List<String> getTransforms() {
@@ -130,13 +141,22 @@ public class SAMLObjectContentReference implements ConfigurableContentReference,
             final Transforms dsigTransforms = new Transforms(signature.getDocument());
             for (int i=0; i<transforms.size(); i++) {
                 final String transform = transforms.get(i);
-                dsigTransforms.addTransform(transform);
-                
+
+                if (transform.equals(Transforms.TRANSFORM_XPATH2FILTER)) { // Hybrid signature case. Remove classical one from the root.
+                    XPath2FilterContainer xpathC = XPath2FilterContainer.newInstanceSubtract(signature.getDocument(), SignatureConstants.EXTRA_SIGNATURE_XPATH2_FILTER);
+                    xpathC.setXPathNamespaceContext("dsig-xpath", Transforms.TRANSFORM_XPATH2FILTER);
+                    xpathC.setXPathNamespaceContext("saml2p", SAMLConstants.SAML20P_NS);
+                    xpathC.setXPathNamespaceContext("ds", SignatureConstants.XMLSIG_NS);
+                    dsigTransforms.addTransform(Transforms.TRANSFORM_XPATH2FILTER, xpathC.getElement());
+                } else {
+                    dsigTransforms.addTransform(transform);
+                }
+
                 if (transform.equals(SignatureConstants.TRANSFORM_C14N_EXCL_WITH_COMMENTS) ||
-                    transform.equals(SignatureConstants.TRANSFORM_C14N_EXCL_OMIT_COMMENTS)) {
-                    
+                        transform.equals(SignatureConstants.TRANSFORM_C14N_EXCL_OMIT_COMMENTS)) {
+
                     processExclusiveTransform(signature, dsigTransforms.item(i));
-                    
+
                 }
             }
 
@@ -146,17 +166,19 @@ public class SAMLObjectContentReference implements ConfigurableContentReference,
                 log.debug("SignableSAMLObject had no reference ID, signing using whole document Reference URI");
                 signature.addDocument("" , dsigTransforms, digestAlgorithm);
             }
-            
+
         } catch (final TransformationException e) {
             log.error("Unsupported signature transformation", e);
         } catch (final XMLSignatureException e) {
             log.error("Error adding content reference to signature", e);
+        } catch (final XMLSecurityException e) {
+            log.error("Error creating XPath filter transform.", e);
         }
     }
 
     /**
      * Populate the inclusive namspace prefixes on the specified Apache (exclusive) transform object.
-     * 
+     *
      * @param signature the Apache XMLSignature object
      * @param transform the Apache Transform object representing an exclusive transform
      */
@@ -167,7 +189,7 @@ public class SAMLObjectContentReference implements ConfigurableContentReference,
         log.debug("Adding list of inclusive namespaces for signature exclusive canonicalization transform");
         final LazySet<String> inclusiveNamespacePrefixes = new LazySet<>();
         populateNamespacePrefixes(inclusiveNamespacePrefixes, signableObject);
-        
+
         if (inclusiveNamespacePrefixes != null && inclusiveNamespacePrefixes.size() > 0) {
             final InclusiveNamespaces inclusiveNamespaces = new InclusiveNamespaces(signature.getDocument(),
                     inclusiveNamespacePrefixes);
@@ -178,12 +200,12 @@ public class SAMLObjectContentReference implements ConfigurableContentReference,
     /**
      * Populates the given set with the non-visibly used namespace prefixes used by the given XMLObject 
      * and all of its descendants, as determined by the signature content object's namespace manager.
-     * 
+     *
      * @param namespacePrefixes the namespace prefix set to be populated
      * @param signatureContent the XMLObject whose namespace prefixes will be used to populate the set
      */
     private void populateNamespacePrefixes(@Nonnull @NonnullElements final Set<String> namespacePrefixes,
-            @Nonnull final XMLObject signatureContent) {
+                                           @Nonnull final XMLObject signatureContent) {
         for (final String prefix: signatureContent.getNamespaceManager().getNonVisibleNamespacePrefixes()) {
             if (prefix != null) {
                 // For the default namespace prefix, exclusive c14n uses the special token "#default".

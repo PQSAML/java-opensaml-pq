@@ -65,7 +65,7 @@ public class SAMLSignatureProfileValidator implements SignaturePrevalidator {
     /**
      * Validate an instance of {@link SignatureImpl}, which is in turn based on underlying Apache XML Security
      * <code>XMLSignature</code> instance.
-     * 
+     *
      * @param sigImpl the signature implementation object to validate
      * @throws SignatureException thrown if the signature is not valid with respect to the profile
      */
@@ -78,7 +78,7 @@ public class SAMLSignatureProfileValidator implements SignaturePrevalidator {
         final XMLSignature apacheSig = sigImpl.getXMLSignature();
 
         if (!(sigImpl.getParent() instanceof SignableSAMLObject)) {
-            log.error("Signature is not an immedidate child of a SignableSAMLObject");
+            log.error("Signature is not an immediate child of a SignableSAMLObject");
             throw new SignatureException("Signature is not an immediate child of a SignableSAMLObject.");
         }
         final SignableSAMLObject signableObject = (SignableSAMLObject) sigImpl.getParent();
@@ -88,15 +88,15 @@ public class SAMLSignatureProfileValidator implements SignaturePrevalidator {
         validateReferenceURI(ref.getURI(), signableObject);
 
         validateTransforms(ref);
-        
+
         validateObjectChildren(apacheSig);
     }
 
     /**
      * Validate the Signature's SignedInfo Reference.
-     * 
+     *
      * The SignedInfo must contain exactly 1 Reference.
-     * 
+     *
      * @param apacheSig the Apache XML Signature instance
      * @return the valid Reference contained within the SignedInfo
      * @throws SignatureException thrown if the Signature does not contain exactly 1 Reference, or if there is an error
@@ -125,11 +125,11 @@ public class SAMLSignatureProfileValidator implements SignaturePrevalidator {
 
     /**
      * Validate the Signature's Reference URI.
-     * 
+     *
      * First validate the Reference URI against the parent's ID itself.  Then validate that the 
      * URI (if non-empty) resolves to the same Element node as is cached by the SignableSAMLObject.
-     * 
-     * 
+     *
+     *
      * @param uri the Signature Reference URI attribute value
      * @param signableObject the SignableSAMLObject whose signature is being validated
      * @throws SignatureException  if the URI is invalid or doesn't resolve to the expected DOM node
@@ -138,39 +138,39 @@ public class SAMLSignatureProfileValidator implements SignaturePrevalidator {
             throws SignatureException {
         final String id = signableObject.getSignatureReferenceID();
         validateReferenceURI(uri, id);
-        
+
         if (Strings.isNullOrEmpty(uri)) {
             return;
         }
-        
+
         final String uriID = uri.substring(1);
-        
+
         final Element expected = signableObject.getDOM();
         if (expected == null) {
             log.error("SignableSAMLObject does not have a cached DOM Element.");
             throw new SignatureException("SignableSAMLObject does not have a cached DOM Element.");
         }
         final Document doc = expected.getOwnerDocument();
-        
+
         final Element resolved = doc.getElementById(uriID);
         if (resolved == null) {
             log.error("DOM Document getElementById could not resolve the Element for id reference: {}", uriID);
             throw new SignatureException("DOM Document getElementById could not resolve the Element for id reference: "
                     + uriID);
         }
-        
+
         if (!expected.isSameNode(resolved)) {
             log.error("Signature Reference URI '{}' did not resolve to the expected parent Element", uri);
             throw new SignatureException("Signature Reference URI did not resolve to the expected parent Element");
         }
     }
-    
+
     /**
      * Validate the Reference URI and parent ID attribute values.
-     * 
+     *
      * The URI must either be null or empty (indicating that the entire enclosing document was signed), or else it must
      * be a local document fragment reference and point to the SAMLObject parent via the latter's ID attribute value.
-     * 
+     *
      * @param uri the Signature Reference URI attribute value
      * @param id the Signature parents ID attribute value
      * @throws SignatureException thrown if the URI or ID attribute values are invalid
@@ -192,11 +192,11 @@ public class SAMLSignatureProfileValidator implements SignaturePrevalidator {
 
     /**
      * Validate the transforms included in the Signature Reference.
-     * 
+     *
      * The Reference may contain at most 2 transforms. One of them must be the Enveloped signature transform. An
      * Exclusive Canonicalization transform (with or without comments) may also be present. No other transforms are
      * allowed.
-     * 
+     *
      * @param reference the Signature reference containing the transforms to evaluate
      * @throws SignatureException thrown if the set of transforms is invalid
      */
